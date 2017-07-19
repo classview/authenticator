@@ -1,2 +1,1 @@
-# authenticator
 Autenticador de usuários
