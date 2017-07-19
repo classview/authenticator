@@ -1,1 +1,1 @@
-Autenticador de usuários
+Autenticador de usuários do site
