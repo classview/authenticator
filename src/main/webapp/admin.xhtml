@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+      
+      <h:head>
+      	<title>Gerenciar Perfis</title>
+      </h:head>
+      <h:body>
+      	<p:growl id="growl" sticky="false" showDetail="true" life="1000"/>
+      	<h:form id="msg-form">
+      		<p:remoteCommand name="rc" update="growl" actionListener="#{adminView.getMsgListaPronta()}" />
+      	</h:form>
+      	<h:form id="form">
+      		<p:dataGrid var="perfil" value="#{adminView.listaPerfis}" columns="3" layout="grid"
+		        		rows="12" paginator="true" id="perfis"
+		        		paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+		 
+		        <f:facet name="header">
+		            Perfis cadastrados
+		        </f:facet>
+		 
+		        <p:panel header="#{perfil.nome}" style="text-align:center">
+		            <h:panelGrid columns="1" style="width:100%">
+		            	<p:graphicImage value="#{adminView.imagem}">
+		            		<f:param name="perfilId" value="#{perfil.id}"/>
+		            	</p:graphicImage>
+		            	<h:outputText value="#{perfil.email}" />
+		            	<h:outputText value="" />
+	            		<h:outputText value="#{perfil.adminAsString}" />
+		            </h:panelGrid>
+		        </p:panel>
+		 
+		    </p:dataGrid>
+		</h:form>
+		<script type="text/javascript">
+			$("#perfis").ready(function(){
+				rc();
+			});
+		</script>
+      </h:body>
+</html>
