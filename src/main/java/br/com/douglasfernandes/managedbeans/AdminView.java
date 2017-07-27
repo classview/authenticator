@@ -8,13 +8,15 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 
-import org.primefaces.context.RequestContext;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
-import br.com.douglasfernandes.dataservices.dao.PerfilDao;
+import br.com.douglasfernandes.dataservices.dao.interfaces.PerfilDao;
 import br.com.douglasfernandes.dataservices.entities.Perfil;
-import br.com.douglasfernandes.dataservices.factory.DataService;
 import br.com.douglasfernandes.utils.Logs;
 
 /**
@@ -22,10 +24,15 @@ import br.com.douglasfernandes.utils.Logs;
  * @author douglas.f.filho
  *
  */
+@Controller
+@Transactional
 @ManagedBean
 @SessionScoped
 public class AdminView {
-	private PerfilDao dao;
+	
+	@Autowired
+	@Qualifier("perfilDaoImpl")
+	PerfilDao perfilDao;
 	private List<Perfil> perfis;
 	
 	public void getMsgListaPronta(){
@@ -50,7 +57,7 @@ public class AdminView {
 		if(perfilId != null && !perfilId.equals("")){
 			Logs.info("[AdminView]::getImagem::Id de perfil obtido da request = "+perfilId);
 			long id = Long.parseLong(perfilId);
-			Perfil perfil = dao.pegarPorId(id);
+			Perfil perfil = perfilDao.pegarPorId(id);
 			return perfil.getFotoAsStream();
 		}
 		else{
@@ -61,21 +68,14 @@ public class AdminView {
 	@PostConstruct
 	public void init(){
 		Logs.info("[AdminView]::init::Iniciando a pagina ao acessar a mesma.");
-		RequestContext context = RequestContext.getCurrentInstance();
-		
 		try{
 			Logs.info("[AdminView]::init::Obtendo lista de perfis...");
-			dao = DataService.getPerfilService(FacesContext.getCurrentInstance()).getPerfilAccess();
-			perfis = dao.listar();
+			perfis = perfilDao.listar();
 			Logs.info("[AdminView]::init::Lista de perfis obtida e instancia no objeto de lista privado.");
-			
-			context.addCallbackParam("status", true);
 		}
 		catch(Exception e){
 			Logs.warn("[AdminView]::acessar::Erro ao tentar exibir tela de perfis.Exception");
 			e.printStackTrace();
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL,"Erro","Erro no servidor."));
-        	context.addCallbackParam("status", false);
 		}
 	}
 	

@@ -7,4 +7,7 @@
 	<lifecycle>
 	    <phase-listener>br.com.douglasfernandes.interceptor.MainInterceptor</phase-listener>
 	</lifecycle>
+	<application>
+         <el-resolver>org.springframework.web.jsf.el.SpringBeanFacesELResolver</el-resolver>
+    </application>
 </faces-config>
