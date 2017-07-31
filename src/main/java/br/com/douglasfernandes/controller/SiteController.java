@@ -8,8 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import br.com.douglasfernandes.dataservices.dao.interfaces.PerfilDao;
 import br.com.douglasfernandes.dataservices.entities.Perfil;
+import br.com.douglasfernandes.dataservices.services.interfaces.PerfilService;
 import br.com.douglasfernandes.utils.Logs;
 
 @Controller
@@ -17,8 +17,8 @@ import br.com.douglasfernandes.utils.Logs;
 public class SiteController {
 	
 	@Autowired
-	@Qualifier("perfilDaoImpl")
-	PerfilDao perfilDao;
+	@Qualifier("perfilServiceImpl")
+	PerfilService perfilService;
 	
 	@RequestMapping(value={"/","home"})
 	public String home(HttpSession session){
@@ -39,7 +39,7 @@ public class SiteController {
 	@RequestMapping("login")
 	public String login(HttpSession session){
 		try {
-			perfilDao.primeiroAcesso();
+			perfilService.init();
 		} catch (Exception e) {
 			Logs.warn("[SiteController]::login::Erro ao tentar configurar foto padrão de perfil.");
 			e.printStackTrace();

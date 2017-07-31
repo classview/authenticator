@@ -15,8 +15,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.douglasfernandes.dataservices.dao.interfaces.PerfilDao;
 import br.com.douglasfernandes.dataservices.entities.Perfil;
+import br.com.douglasfernandes.dataservices.services.interfaces.PerfilService;
 import br.com.douglasfernandes.utils.Logs;
 
 /**
@@ -31,8 +31,9 @@ import br.com.douglasfernandes.utils.Logs;
 public class AdminView {
 	
 	@Autowired
-	@Qualifier("perfilDaoImpl")
-	PerfilDao perfilDao;
+	@Qualifier("perfilServiceImpl")
+	PerfilService perfilService;
+	
 	private List<Perfil> perfis;
 	
 	public void getMsgListaPronta(){
@@ -57,8 +58,7 @@ public class AdminView {
 		if(perfilId != null && !perfilId.equals("")){
 			Logs.info("[AdminView]::getImagem::Id de perfil obtido da request = "+perfilId);
 			long id = Long.parseLong(perfilId);
-			Perfil perfil = perfilDao.pegarPorId(id);
-			return perfil.getFotoAsStream();
+			return perfilService.getFotoDePerfil(id);
 		}
 		else{
 			return new DefaultStreamedContent();
@@ -70,7 +70,7 @@ public class AdminView {
 		Logs.info("[AdminView]::init::Iniciando a pagina ao acessar a mesma.");
 		try{
 			Logs.info("[AdminView]::init::Obtendo lista de perfis...");
-			perfis = perfilDao.listar();
+			perfis = perfilService.listarPerfis();
 			Logs.info("[AdminView]::init::Lista de perfis obtida e instancia no objeto de lista privado.");
 		}
 		catch(Exception e){

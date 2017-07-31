@@ -15,8 +15,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.douglasfernandes.dataservices.dao.interfaces.PerfilDao;
 import br.com.douglasfernandes.dataservices.entities.Perfil;
+import br.com.douglasfernandes.dataservices.services.interfaces.PerfilService;
 import br.com.douglasfernandes.pojos.DefaultResponse;
 import br.com.douglasfernandes.utils.Logs;
 
@@ -32,8 +32,8 @@ import br.com.douglasfernandes.utils.Logs;
 public class UserLoginView {
 	
 	@Autowired
-	@Qualifier("perfilDaoImpl")
-	PerfilDao perfilDao;
+	@Qualifier("perfilServiceImpl")
+	PerfilService perfilService;
 	
 	private Perfil perfil = new Perfil();
 	
@@ -48,7 +48,7 @@ public class UserLoginView {
         	HttpServletRequest request = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
         	HttpSession session = request.getSession();
         	
-        	DefaultResponse response = perfilDao.logar(perfil, session);
+        	DefaultResponse response = perfilService.logarPerfil(perfil, session);
              
             FacesContext.getCurrentInstance().addMessage(null, response.getMensagem());
             context.addCallbackParam("loggedIn", response.getStatus());
@@ -65,6 +65,6 @@ public class UserLoginView {
     @PostConstruct
 	public void init(){
     	Logs.info("[UserLoginView]::init::chamada ao dao necessaria para realizar autowire.");
-    	perfilDao.primeiroAcesso();
+    	perfilService.init();
     }
 }
