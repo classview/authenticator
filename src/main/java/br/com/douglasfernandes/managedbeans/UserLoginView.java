@@ -64,7 +64,7 @@ public class UserLoginView {
     
     @PostConstruct
 	public void init(){
-    	Logs.info("[UserLoginView]::init::chamada ao dao necessaria para realizar autowire.");
+    	Logs.info("[UserLoginView]::init::chamada de inicializacao.");
     	perfilService.init();
     }
 }

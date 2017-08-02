@@ -6,17 +6,37 @@
       
       <h:head>
       	<title>Gerenciar Perfis</title>
+      	<link href="#{facesContext.externalContext.requestContextPath}/resources/css/default.css" rel="stylesheet" type="text/css" />
+      	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
       </h:head>
       <h:body>
+      	<h:form id="action-menu">
+      		<p:commandLink styleClass="add-button" title="Cadastrar" onclick="PF('cadForm').show();">
+      			<i id="btn-cadastrar-perfil" class="material-icons">exposure_plus_1</i>
+      		</p:commandLink>
+      		<h:outputLink value="logout" styleClass="logout-button" title="Logout">
+      			<i id="btn-logout" class="material-icons">lock_outline</i>
+      		</h:outputLink>
+      	</h:form>
+      	
       	<p:growl id="growl" sticky="false" showDetail="true" life="1000"/>
+      	
       	<h:form id="msg-form">
       		<p:remoteCommand name="rc" update="growl" actionListener="#{adminView.getMsgListaPronta()}" />
       	</h:form>
+      	<script type="text/javascript">
+			$("#perfis").ready(function(){
+				rc();
+			});
+		</script>
+		
       	<h:form id="form">
+      		<p:growl id="result" sticky="false" showDetail="true" life="1500"/>
       		<p:dataGrid var="perfil" value="#{adminView.listaPerfis}" columns="3" layout="grid"
-		        		rows="12" paginator="true" id="perfis"
-		        		paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
-		 
+		        		rows="9" paginator="true" id="perfis"
+		        		paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+		        		style="margin-top: 1rem;">
+		        		
 		        <f:facet name="header">
 		            Perfis cadastrados
 		        </f:facet>
@@ -29,15 +49,43 @@
 		            	<h:outputText value="#{perfil.email}" />
 		            	<h:outputText value="" />
 	            		<h:outputText value="#{perfil.adminAsString}" />
+	            		<h:outputText value="#{perfil.ativoAsString}" />
 		            </h:panelGrid>
 		        </p:panel>
 		 
 		    </p:dataGrid>
+		    
+		    <p:dialog header="Cadastrar novo Perfil" widgetVar="cadForm" modal="true" height="285" width="375" resizable="false" style="overflow: hidden;">
+	    		<h:panelGrid id="cadastrar" columns="2" style="width: 100%; height: 100%;">
+	   				<h:outputText style="text-align:right;" value="Foto:" />
+	   				<p:fileUpload accept="image/*" label="Foto" value="#{adminView.file}" mode="simple" skinSimple="true" style="float: left;width: 100%;"/>
+	   				
+	   				<h:outputText style="text-align:right;" value="Nome:" />
+   					<h:inputText value="#{adminView.cadastrar.nome}" />
+   					
+   					<h:outputText style="text-align:right;" value="E-mail:" />
+   					<h:inputText value="#{adminView.cadastrar.email}" />
+   					
+   					<h:outputText style="text-align:right;" value="Senha:" />
+   					<h:inputSecret value="#{adminView.cadastrar.senha}" />
+   					
+   					<h:outputText style="text-align:right;" value="Administrador" />
+   					<p:selectBooleanCheckbox value="#{adminView.cadastrar.admin}"/>
+	   				
+	   				<f:facet name="footer">
+	   					<p:commandButton actionListener="#{adminView.cadastrarPerfil}" value="Cadastrar" update="result cadastrar" oncomplete="refreshPage();"/>
+		   				<script type="text/javascript">
+		   					function refreshPage(){
+			   					setTimeout(function(){
+			   						window.location.href = 'home';
+				   				},1500);
+			   				}
+		   				</script>
+	   				</f:facet>
+	   				
+	   			</h:panelGrid>
+			</p:dialog>
 		</h:form>
-		<script type="text/javascript">
-			$("#perfis").ready(function(){
-				rc();
-			});
-		</script>
-      </h:body>
+		
+	</h:body>
 </html>

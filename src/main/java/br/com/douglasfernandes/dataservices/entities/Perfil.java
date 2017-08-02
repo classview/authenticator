@@ -27,6 +27,8 @@ public class Perfil {
 	private String email;
 	@Column(name = "admin", nullable = false)
 	private boolean admin;
+	@Column(name = "ativo", nullable = false)
+	private boolean ativo;
 	@Column(name="foto", length=15000000, nullable=false)//Tamanho máximo de 15Mb
 	private byte[] foto;
 	
@@ -57,6 +59,9 @@ public class Perfil {
 	public boolean getAdmin() {
 		return admin;
 	}
+	public boolean isAdmin() {
+		return admin;
+	}
 	public String getAdminAsString(){
 		if(admin)
 			return "Administrador";
@@ -65,6 +70,21 @@ public class Perfil {
 	}
 	public void setAdmin(boolean admin) {
 		this.admin = admin;
+	}
+	public boolean getAtivo() {
+		return ativo;
+	}
+	public boolean isAtivo() {
+		return ativo;
+	}
+	public String getAtivoAsString() {
+		if(ativo)
+			return "Ativo";
+		else
+			return "Desativado";
+	}
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
 	}
 	public byte[] getFoto() {
 		return foto;
@@ -90,6 +110,6 @@ public class Perfil {
 	}
 	@Override
 	public String toString() {
-		return "Perfil [id=" + id + ", nome=" + nome + ", email=" + email + ", admin= " + admin + "]";
+		return "Perfil [id=" + id + ", nome=" + nome + ", email=" + email + ", admin= " + admin + ", ativo= " + ativo + "]";
 	}
 }

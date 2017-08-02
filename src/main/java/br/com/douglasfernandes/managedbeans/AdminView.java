@@ -10,6 +10,7 @@ import javax.faces.context.FacesContext;
 
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.douglasfernandes.dataservices.entities.Perfil;
 import br.com.douglasfernandes.dataservices.services.interfaces.PerfilService;
+import br.com.douglasfernandes.pojos.DefaultResponse;
 import br.com.douglasfernandes.utils.Logs;
 
 /**
@@ -34,8 +36,27 @@ public class AdminView {
 	@Qualifier("perfilServiceImpl")
 	PerfilService perfilService;
 	
-	private List<Perfil> perfis;
+	private Perfil cadastrar = new Perfil();
+	public Perfil getCadastrar(){
+		return cadastrar;
+	}
 	
+	private UploadedFile file;
+	public UploadedFile getFile() {
+        return file;
+    }
+	public void setFile(UploadedFile file) {
+        this.file = file;
+        Logs.info("[AdminView]::setFile::Arquivo subido ao servidor. Size: "+file.getSize());
+        cadastrar.setFoto(file.getContents());
+    }
+	
+	private static List<Perfil> perfis;
+	public List<Perfil> getListaPerfis(){
+		Logs.info("[AdminView]::init::Obtendo lista de perfis...");
+		perfis = perfilService.listarPerfis();
+		return perfis;
+	}
 	public void getMsgListaPronta(){
 		String mensagem = ""+perfis.size();
 		if(perfis.size() < 2)
@@ -44,12 +65,6 @@ public class AdminView {
 			mensagem += " perfis listados.";
 		
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Sucesso",mensagem));
-	}
-	
-	public List<Perfil> getListaPerfis(){
-		Logs.info("[AdminView]::getListaPerfis::Lista de perfis obtida do objeto ja instanciado.");
-    	
-		return this.perfis;
 	}
 	
 	public StreamedContent getImagem(){
@@ -65,13 +80,20 @@ public class AdminView {
 		}
 	}
 	
+	public void cadastrarPerfil(){
+		Logs.info("[AdminView]::cadastrarPerfil::Perfil a ser cadastrado: "+cadastrar.toString());
+		DefaultResponse response = perfilService.adicionarPerfil(cadastrar);
+		
+		cadastrar = new Perfil();
+		
+		FacesContext.getCurrentInstance().addMessage(null, response.getMensagem());
+	}
+	
 	@PostConstruct
 	public void init(){
 		Logs.info("[AdminView]::init::Iniciando a pagina ao acessar a mesma.");
 		try{
-			Logs.info("[AdminView]::init::Obtendo lista de perfis...");
-			perfis = perfilService.listarPerfis();
-			Logs.info("[AdminView]::init::Lista de perfis obtida e instancia no objeto de lista privado.");
+			getListaPerfis();
 		}
 		catch(Exception e){
 			Logs.warn("[AdminView]::acessar::Erro ao tentar exibir tela de perfis.Exception");

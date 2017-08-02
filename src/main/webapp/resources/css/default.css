@@ -1,0 +1,43 @@
+.logout-button{
+	float: right;
+    margin-top: 0.25rem;
+    margin-right: 0.25rem;
+}
+
+.logout-button img{
+	height: 1.3rem;
+}
+
+.add-button{
+	float: left;
+    margin-top: 0.25rem;
+    margin-left: 0.25rem;
+}
+
+.add-button img{
+	height: 1.3rem;
+}
+
+#btn-cadastrar-perfil{
+	color: gray;
+}
+
+#btn-cadastrar-perfil:hover{
+	color: blue;
+}
+
+#btn-logout{
+	color: gray;
+}
+
+#btn-logout:hover{
+	color: darkgreen;
+}
+
+.ui-dialog-content table tbody tr {
+    border: transparent;
+}
+
+.ui-fileupload-filename{
+	font-size: 0.8rem;
+}
