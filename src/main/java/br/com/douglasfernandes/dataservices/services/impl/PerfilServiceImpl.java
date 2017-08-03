@@ -182,12 +182,29 @@ public class PerfilServiceImpl implements PerfilService{
 	public DefaultResponse removerPerfil(long id) {
 		DefaultResponse response = new DefaultResponse();
 		try{
-			Perfil perfil = perfilDao.pegarPorId(id);
-			perfilDao.remover(perfil);
-			response.setStatus(true);
-			response.setMensagem(new FacesMessage(FacesMessage.SEVERITY_INFO,"Sucesso","Perfil removido com sucesso."));
-			
-			Logs.info("[PerfilServiceImpl]::removerPerfil::perfil removido.");
+			List<Perfil> perfis = listarPerfis();
+			if(perfis != null && perfis.size() > 1){
+				Perfil perfil = perfilDao.pegarPorId(id);
+				if(perfilDao.contarPerfisAdministradores() < 2 && perfil.isAdmin()){
+					response.setStatus(false);
+					response.setMensagem(new FacesMessage(FacesMessage.SEVERITY_ERROR,"Erro","Deve haver ao menos um perfil Administrador do sistema."));
+					
+					Logs.info("[PerfilServiceImpl]::removerPerfil::perfil nao removido. Deve haver ao menos um administrador do sistema.");
+				}
+				else{
+					perfilDao.remover(perfil);
+					response.setStatus(true);
+					response.setMensagem(new FacesMessage(FacesMessage.SEVERITY_INFO,"Sucesso","Perfil removido com sucesso."));
+					
+					Logs.info("[PerfilServiceImpl]::removerPerfil::perfil removido.");
+				}
+			}
+			else{
+				response.setStatus(false);
+				response.setMensagem(new FacesMessage(FacesMessage.SEVERITY_ERROR,"Erro","Deve haver ao menos um perfil Administrador do sistema."));
+				
+				Logs.info("[PerfilServiceImpl]::removerPerfil::perfil nao removido. Deve haver ao menos um administrador do sistema.");
+			}
 			
 			return response;
 		}
@@ -288,6 +305,18 @@ public class PerfilServiceImpl implements PerfilService{
 			Logs.warn("[PerfilServiceImpl]::jaTemComEsteEmail:::Erro ao tentar verificar se ja existe perfil com este email [" + email + "]. Excecao:");
 			e.printStackTrace();
 			return true;
+		}
+	}
+
+	@Override
+	public Perfil pegarPorId(long id) {
+		try{
+			return perfilDao.pegarPorId(id);
+		}
+		catch(Exception e){
+			Logs.warn("[PerfilServiceImpl]::pegarPorId:::Erro ao tentar Obter perfil por id. Excecao:");
+			e.printStackTrace();
+			return null;
 		}
 	}
 	

@@ -10,7 +10,6 @@ import javax.faces.context.FacesContext;
 
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
-import org.primefaces.model.UploadedFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -41,15 +40,19 @@ public class AdminView {
 		return cadastrar;
 	}
 	
-	private UploadedFile file;
-	public UploadedFile getFile() {
-        return file;
-    }
-	public void setFile(UploadedFile file) {
-        this.file = file;
-        Logs.info("[AdminView]::setFile::Arquivo subido ao servidor. Size: "+file.getSize());
-        cadastrar.setFoto(file.getContents());
-    }
+	private Perfil atualizar = new Perfil();
+	public Perfil getAtualizar(){
+		return atualizar;
+	}
+	
+	public void prepararAtualizacao(){
+		FacesContext context = FacesContext.getCurrentInstance();
+		String perfilId = context.getExternalContext().getRequestParameterMap().get("perfilId");
+		if(perfilId != null && !perfilId.equals("")){
+			long id = Long.parseLong(perfilId);
+			atualizar = perfilService.pegarPorId(id);
+		}
+	}
 	
 	private static List<Perfil> perfis;
 	public List<Perfil> getListaPerfis(){
@@ -87,6 +90,30 @@ public class AdminView {
 		cadastrar = new Perfil();
 		
 		FacesContext.getCurrentInstance().addMessage(null, response.getMensagem());
+	}
+	
+	public void atualizarPerfil(){
+		Logs.info("[AdminView]::atualizarPerfil::Perfil a ser atualizado: "+atualizar.toString());
+		DefaultResponse response = perfilService.atualizarPerfil(atualizar);
+		
+		atualizar = new Perfil();
+		
+		FacesContext.getCurrentInstance().addMessage(null, response.getMensagem());
+	}
+	
+	public void removerPerfil(){
+		FacesContext context = FacesContext.getCurrentInstance();
+		String perfilId = context.getExternalContext().getRequestParameterMap().get("perfilId");
+		if(perfilId != null && !perfilId.equals("")){
+			long id = Long.parseLong(perfilId);
+			
+			DefaultResponse response = perfilService.removerPerfil(id);
+			
+			FacesContext.getCurrentInstance().addMessage(null, response.getMensagem());
+		}
+		else{
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Id de perfil não encontrado."));
+		}
 	}
 	
 	@PostConstruct

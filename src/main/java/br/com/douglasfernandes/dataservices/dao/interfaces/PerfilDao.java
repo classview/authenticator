@@ -12,4 +12,5 @@ public interface PerfilDao {
 	public Perfil pegarPorNome(String nome);
 	public Perfil pegarPorEmail(String email);
 	public List<Perfil> listar() throws Exception;
+	public int contarPerfisAdministradores() throws Exception;
 }

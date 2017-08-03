@@ -12,6 +12,7 @@ import br.com.douglasfernandes.pojos.DefaultResponse;
 public interface PerfilService {
 	public DefaultResponse logarPerfil(Perfil perfil, HttpSession session);
 	public DefaultResponse adicionarPerfil(Perfil perfil);
+	public Perfil pegarPorId(long id);
 	public DefaultResponse atualizarPerfil(Perfil perfil);
 	public DefaultResponse removerPerfil(long id);
 	public List<Perfil> listarPerfis();

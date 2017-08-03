@@ -8,6 +8,18 @@
       	<title>Gerenciar Perfis</title>
       	<link href="#{facesContext.externalContext.requestContextPath}/resources/css/default.css" rel="stylesheet" type="text/css" />
       	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+      	
+      	<link rel="shortcut icon" href="#{facesContext.externalContext.requestContextPath}/resources/favicon/favicon.ico" type="image/x-icon" />
+		<link rel="icon" href="#{facesContext.externalContext.requestContextPath}/resources/favicon/favicon.ico" type="image/x-icon" />
+      	
+      	<script type="text/javascript">
+			function refreshPage(){
+				setTimeout(function(){
+					window.location.href = 'home';
+				},1500);
+			}
+		</script>
+      	
       </h:head>
       <h:body>
       	<h:form id="action-menu">
@@ -31,7 +43,6 @@
 		</script>
 		
       	<h:form id="form">
-      		<p:growl id="result" sticky="false" showDetail="true" life="1500"/>
       		<p:dataGrid var="perfil" value="#{adminView.listaPerfis}" columns="3" layout="grid"
 		        		rows="9" paginator="true" id="perfis"
 		        		paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
@@ -40,8 +51,18 @@
 		        <f:facet name="header">
 		            Perfis cadastrados
 		        </f:facet>
-		 
-		        <p:panel header="#{perfil.nome}" style="text-align:center">
+		 		
+		 		<p:panel header="#{perfil.nome}" style="text-align:center">
+		        	<p:commandLink styleClass="rem-button" title="Remover" actionListener="#{adminView.removerPerfil()}" update="growl" oncomplete="refreshPage();">
+		        		<f:param name="perfilId" value="#{perfil.id}"/>
+		      			<i id="btn-remover-perfil" class="material-icons">delete</i>
+		      		</p:commandLink>
+		      		
+		      		<p:commandLink styleClass="upd-button" actionListener="#{adminView.prepararAtualizacao}" title="Atualizar" update="atualizar" oncomplete="PF('updForm').show();">
+		      			<f:param name="perfilId" value="#{perfil.id}"/>
+		      			<i id="btn-atualizar-perfil" class="material-icons">mode_edit</i>
+		      		</p:commandLink>
+		        	
 		            <h:panelGrid columns="1" style="width:100%">
 		            	<p:graphicImage value="#{adminView.imagem}">
 		            		<f:param name="perfilId" value="#{perfil.id}"/>
@@ -52,13 +73,36 @@
 	            		<h:outputText value="#{perfil.ativoAsString}" />
 		            </h:panelGrid>
 		        </p:panel>
-		 
+		 		
+		 		<p:dialog header="Atualizar Perfil" widgetVar="updForm" modal="true" height="285" width="375" resizable="false" style="overflow: hidden;">
+		    		<h:panelGrid id="atualizar" columns="2" style="width: 100%; height: 100%;">
+		   				<h:outputText style="text-align:right;" value="Foto:" />
+		   				<p:fileUpload accept="image/*" label="Foto" value="#{adminView.atualizar.fotoFromFile}" mode="simple" skinSimple="true" style="float: left;width: 100%;"/>
+		   				
+		   				<h:outputText style="text-align:right;" value="Nome:" />
+	   					<h:inputText value="#{adminView.atualizar.nome}" />
+	   					
+	   					<h:outputText style="text-align:right;" value="E-mail:" />
+	   					<h:inputText value="#{adminView.atualizar.email}" />
+	   					
+	   					<h:outputText style="text-align:right;" value="Senha:" />
+	   					<h:inputSecret value="#{adminView.atualizar.senha}" />
+	   					
+	   					<h:outputText style="text-align:right;" value="Administrador" />
+	   					<p:selectBooleanCheckbox value="#{adminView.atualizar.admin}"/>
+		   				
+		   				<f:facet name="footer">
+		   					<p:commandButton actionListener="#{adminView.atualizarPerfil}" value="Atualizar" update="growl atualizar" oncomplete="refreshPage();"/>
+		   				</f:facet>
+		   			</h:panelGrid>
+				</p:dialog>
+		 		
 		    </p:dataGrid>
 		    
 		    <p:dialog header="Cadastrar novo Perfil" widgetVar="cadForm" modal="true" height="285" width="375" resizable="false" style="overflow: hidden;">
 	    		<h:panelGrid id="cadastrar" columns="2" style="width: 100%; height: 100%;">
 	   				<h:outputText style="text-align:right;" value="Foto:" />
-	   				<p:fileUpload accept="image/*" label="Foto" value="#{adminView.file}" mode="simple" skinSimple="true" style="float: left;width: 100%;"/>
+	   				<p:fileUpload accept="image/*" label="Foto" value="#{adminView.cadastrar.fotoFromFile}" mode="simple" skinSimple="true" style="float: left;width: 100%;"/>
 	   				
 	   				<h:outputText style="text-align:right;" value="Nome:" />
    					<h:inputText value="#{adminView.cadastrar.nome}" />
@@ -73,16 +117,8 @@
    					<p:selectBooleanCheckbox value="#{adminView.cadastrar.admin}"/>
 	   				
 	   				<f:facet name="footer">
-	   					<p:commandButton actionListener="#{adminView.cadastrarPerfil}" value="Cadastrar" update="result cadastrar" oncomplete="refreshPage();"/>
-		   				<script type="text/javascript">
-		   					function refreshPage(){
-			   					setTimeout(function(){
-			   						window.location.href = 'home';
-				   				},1500);
-			   				}
-		   				</script>
+	   					<p:commandButton actionListener="#{adminView.cadastrarPerfil}" value="Cadastrar" update="growl cadastrar" oncomplete="refreshPage();"/>
 	   				</f:facet>
-	   				
 	   			</h:panelGrid>
 			</p:dialog>
 		</h:form>

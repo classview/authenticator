@@ -4,18 +4,10 @@
     margin-right: 0.25rem;
 }
 
-.logout-button img{
-	height: 1.3rem;
-}
-
 .add-button{
 	float: left;
     margin-top: 0.25rem;
     margin-left: 0.25rem;
-}
-
-.add-button img{
-	height: 1.3rem;
 }
 
 #btn-cadastrar-perfil{
@@ -40,4 +32,25 @@
 
 .ui-fileupload-filename{
 	font-size: 0.8rem;
+}
+
+.rem-button{
+	float: right;
+    margin-top: -40px;
+    color: gray;
+}
+
+.rem-button:hover{
+	color: red;
+}
+
+.upd-button{
+	float: right;
+    margin-top: -40px;
+    margin-right: 2rem;
+    color: gray;
+}
+
+.upd-button:hover{
+	color: green;
 }

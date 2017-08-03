@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import org.apache.commons.codec.binary.Hex;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
 
 @Entity
 @Table(name="perfis")
@@ -96,6 +97,9 @@ public class Perfil {
 	}
 	public void setFoto(byte[] foto) {
 		this.foto = foto;
+	}
+	public void setFotoFromFile(UploadedFile file){
+		foto = file.getContents();
 	}
 	public void setDefaultFoto() throws Exception
 	{

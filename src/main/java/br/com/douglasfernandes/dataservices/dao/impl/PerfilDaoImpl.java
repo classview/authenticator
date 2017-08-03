@@ -131,5 +131,21 @@ public class PerfilDaoImpl implements PerfilDao{
 			return null;
 		}
 	}
+
+	@Override
+	public int contarPerfisAdministradores() throws Exception {
+		Query query = manager.createQuery("select p from Perfil as p where admin = :isAdmin");
+		query.setParameter("isAdmin", true);
+		@SuppressWarnings("unchecked")
+		List<Perfil> perfis = query.getResultList();
+		if(perfis != null && perfis.size() > 0){
+			Logs.info("[PerfilDaoImpl]::contarPerfisAdministradores:::Perfis Administradores encontrado: " + perfis.size());
+			return perfis.size();
+		}
+		else{
+			Logs.warn("[PerfilDaoImpl]::contarPerfisAdministradores:::Nenhum perfil listado.");
+			return 0;
+		}
+	}
 	
 }
