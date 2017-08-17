@@ -1,5 +1,7 @@
 package br.com.douglasfernandes.managedbeans;
 
+import java.util.Calendar;
+
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -17,7 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.douglasfernandes.dataservices.entities.Perfil;
 import br.com.douglasfernandes.dataservices.services.interfaces.PerfilService;
-import br.com.douglasfernandes.pojos.DefaultResponse;
+import br.com.douglasfernandes.pojos.response.DefaultResponse;
+import br.com.douglasfernandes.utils.EmailUtil;
 import br.com.douglasfernandes.utils.Logs;
 
 /**
@@ -35,10 +38,54 @@ public class UserLoginView {
 	@Qualifier("perfilServiceImpl")
 	PerfilService perfilService;
 	
-	private Perfil perfil = new Perfil();
+	private Perfil perfil;
 	
 	public Perfil getPerfil(){
 		return this.perfil;
+	}
+	public void setPerfil(Perfil perfil){
+		this.perfil = perfil;
+	}
+	
+	public void mostrarMensagem(){
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Aguarde","Um e-mail será enviado com os passos pra sua nova senha."));
+	}
+	
+	public void esqueciMinhaSenha(){
+		try{
+			String email = this.perfil.getNome();
+			Logs.info("[UserLoginView]::esqueciMinhaSenha::E-mail de recuperacao: "+email);
+			Perfil perfil = perfilService.pegarPorEmail(email);
+			
+			if(perfil != null){
+				Calendar momento1 = Calendar.getInstance();
+				Calendar momento2 = Calendar.getInstance();
+				
+				long m1 = momento1.getTimeInMillis() * 2;
+				long m2 = momento2.getTimeInMillis();
+				
+				long senha = m1 + m2;
+				
+				if(EmailUtil.enviar(email, "ClassView Login", "Você solicitou sua senha de acesso: "+senha)){
+					perfil.setSenha(""+senha);
+					perfilService.atualizarPerfil(perfil);
+					
+					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Sucesso","Uma nova senha de recuperação foi enviada ao seu e-mail."));
+				}
+				else{
+					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Erro","Verifique se seu e-mail foi digitado corretamente."));
+				}
+			}
+			else{
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Erro","Verifique se seu e-mail foi digitado corretamente."));
+			}
+			
+		}
+		catch(Exception e){
+			Logs.info("[UserLoginView]::esqueciMinhaSenha::Erro fatal ao tentar enviar senha por e-mail. Exception");
+        	e.printStackTrace();
+        	FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL,"Erro","Erro no servidor."));
+		}
 	}
    
     public void login(ActionEvent event) {
@@ -66,5 +113,6 @@ public class UserLoginView {
 	public void init(){
     	Logs.info("[UserLoginView]::init::chamada de inicializacao.");
     	perfilService.init();
+    	perfil = new Perfil();
     }
 }

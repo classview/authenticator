@@ -134,8 +134,9 @@ public class PerfilDaoImpl implements PerfilDao{
 
 	@Override
 	public int contarPerfisAdministradores() throws Exception {
-		Query query = manager.createQuery("select p from Perfil as p where admin = :isAdmin");
+		Query query = manager.createQuery("select p from Perfil as p where admin = :isAdmin and ativo = :isAtivo");
 		query.setParameter("isAdmin", true);
+		query.setParameter("isAtivo", true);
 		@SuppressWarnings("unchecked")
 		List<Perfil> perfis = query.getResultList();
 		if(perfis != null && perfis.size() > 0){

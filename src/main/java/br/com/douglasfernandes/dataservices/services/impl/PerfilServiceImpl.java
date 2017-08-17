@@ -5,7 +5,6 @@ import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.servlet.http.HttpSession;
 
-import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.douglasfernandes.dataservices.dao.interfaces.PerfilDao;
 import br.com.douglasfernandes.dataservices.entities.Perfil;
 import br.com.douglasfernandes.dataservices.services.interfaces.PerfilService;
-import br.com.douglasfernandes.pojos.DefaultResponse;
+import br.com.douglasfernandes.pojos.response.DefaultResponse;
 import br.com.douglasfernandes.utils.Logs;
 
 @Service
@@ -138,33 +137,34 @@ public class PerfilServiceImpl implements PerfilService{
 				if(!"".equals(nome) && !"".equals(email) && !"".equals(senha)){
 					Perfil conflito = perfilDao.pegarPorNome(nome);
 					if(conflito != null && conflito.getId() != id){
-						Logs.warn("[PerfilServiceImpl]::atualizar:::Erro ao tentar atualizar perfil: ja tem cadastrado.");
+						Logs.warn("[PerfilServiceImpl]::atualizarPerfil:::Erro ao tentar atualizar perfil: ja tem cadastrado.");
 						response.setStatus(false);
 						response.setMensagem(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro","Já existe um perfil com este nome."));
 					}
 					else{
 						conflito = perfilDao.pegarPorEmail(email);
 						if(conflito != null && conflito.getId() != id){
-							Logs.warn("[PerfilServiceImpl]::atualizar:::Erro ao tentar atualizar perfil: ja tem cadastrado.");
+							Logs.warn("[PerfilServiceImpl]::atualizarPerfil:::Erro ao tentar atualizar perfil: ja tem cadastrado.");
 							response.setStatus(false);
 							response.setMensagem(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro","Já existe um perfil com este email."));
 						}
 						else{
+							Logs.info("[PerfilServiceImpl]::atualizarPerfil:::Perfil a ser atualizado: "+perfil.toString());
 							perfilDao.atualizar(perfil);
-							Logs.warn("[PerfilServiceImpl]::atualizar:::Perfil [" + perfil.getNome() + "] atualizado com exito.");
+							Logs.info("[PerfilServiceImpl]::atualizarPerfil:::Perfil [" + perfil.getNome() + "] atualizado com exito.");
 							response.setStatus(true);
 							response.setMensagem(new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso","Perfil atualizado!"));
 						}
 					}
 				}
 				else{
-					Logs.warn("[PerfilServiceImpl]::atualizar:::Erro ao tentar atualizar perfil. nome e/ou senha nulos");
+					Logs.warn("[PerfilServiceImpl]::atualizarPerfil:::Erro ao tentar atualizar perfil. nome e/ou senha nulos");
 					response.setStatus(false);
 					response.setMensagem(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro","Perfil com nome ou senha inválidos."));
 				}
 			}
 			else{
-				Logs.warn("[PerfilServiceImpl]::adicionarPerfil:::Erro ao tentar atualizar perfil. nulo");
+				Logs.warn("[PerfilServiceImpl]::atualizarPerfil:::Erro ao tentar atualizar perfil. nulo");
 				response.setStatus(false);
 				response.setMensagem(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro","Perfil com nome ou senha inválidos."));
 			}
@@ -172,12 +172,51 @@ public class PerfilServiceImpl implements PerfilService{
 			return response;
 		}
 		catch(Exception e){
-			Logs.warn("[PerfilServiceImpl]::adicionarPerfil:::Erro ao tentar atualizar perfil. Excecao:");
+			Logs.warn("[PerfilServiceImpl]::atualizarPerfil:::Erro ao tentar atualizar perfil. Excecao:");
 			e.printStackTrace();
 			return response;
 		}
 	}
 
+	@Override
+	public DefaultResponse atualizarStatusDoPerfil(long id){
+		DefaultResponse response = new DefaultResponse();
+		
+		try{
+			Perfil perfil = perfilDao.pegarPorId(id);
+			if(perfil.isAdmin()){
+				int admins = perfilDao.contarPerfisAdministradores();
+				if(admins < 2 && perfil.isAtivo()){
+					Logs.warn("[PerfilServiceImpl]::atualizarStatusDoPerfil::Erro - Deve haver ao menos um perfil administrador cadastrado.");
+					response.setStatus(false);
+					response.setMensagem(new FacesMessage(FacesMessage.SEVERITY_ERROR,"Erro","Deve haver ao menos um perfil administrador cadastrado."));
+				}
+				else{
+					perfil.setAtivo(!perfil.getAtivo());
+					perfilDao.atualizar(perfil);
+					Logs.info("[PerfilServiceImpl]::atualizarStatusDoPerfil::Perfil atualizado com exito: "+perfil.toString());
+					response.setStatus(true);
+					response.setMensagem(new FacesMessage(FacesMessage.SEVERITY_INFO,"Sucesso","Perfil atualizado com exito."));
+				}
+			}
+			else{
+				perfil.setAtivo(!perfil.getAtivo());
+				perfilDao.atualizar(perfil);
+				Logs.info("[PerfilServiceImpl]::atualizarStatusDoPerfil::Perfil atualizado com exito: "+perfil.toString());
+				response.setStatus(true);
+				response.setMensagem(new FacesMessage(FacesMessage.SEVERITY_INFO,"Sucesso","Perfil atualizado com exito."));
+			}
+		}
+		catch(Exception e){
+			Logs.warn("[PerfilServiceImpl]::atualizarStatusDoPerfil::Erro ao tentar atualizar o status do perfil. Exception:");
+			e.printStackTrace();
+			response.setStatus(false);
+			response.setMensagem(new FacesMessage(FacesMessage.SEVERITY_FATAL,"Erro","Erro ao tentar atualizar perfil no servidor."));
+		}
+		
+		return response;
+	}
+	
 	@Override
 	public DefaultResponse removerPerfil(long id) {
 		DefaultResponse response = new DefaultResponse();
@@ -228,20 +267,7 @@ public class PerfilServiceImpl implements PerfilService{
 	}
 	
 	@Override
-	public StreamedContent getFotoDePerfil(long id){
-		try{
-			Perfil perfil = perfilDao.pegarPorId(id);
-			return perfil.getFotoAsStream();
-		}
-		catch(Exception e){
-			Logs.warn("[PerfilServiceImpl]::getFotoDePerfil::Erro ao tentar obter a foto de perfil.Exception:");
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	@Override
-	public void init(){
+	public boolean init(){
 		try{
 			List<Perfil> perfis = listarPerfis();
 			if(perfis == null || perfis.size() < 1){
@@ -259,14 +285,17 @@ public class PerfilServiceImpl implements PerfilService{
 				
 				adicionarPerfil(perfil);
 				Logs.info("[PerfilServiceImpl]::init::Criacao de perfil padrao com exito. login: " + nome + " senha:"+senha);
+				return true;
 			}
 			else{
 				Logs.info("[PerfilServiceImpl]::init::Ja existe usuario cadastrado no banco de dados. Usuario padrao desnecessario.");
+				return true;
 			}
 		}
 		catch(Exception e){
 			Logs.warn("[PerfilServiceImpl]::primeiroAcesso:::Erro ao tentar adicionar perfil. Excecao:");
 			e.printStackTrace();
+			return false;
 		}
 	}
 	
@@ -315,6 +344,18 @@ public class PerfilServiceImpl implements PerfilService{
 		}
 		catch(Exception e){
 			Logs.warn("[PerfilServiceImpl]::pegarPorId:::Erro ao tentar Obter perfil por id. Excecao:");
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Override
+	public Perfil pegarPorEmail(String email) {
+		try{
+			return perfilDao.pegarPorEmail(email);
+		}
+		catch(Exception e){
+			Logs.warn("[PerfilServiceImpl]::pegarPorEmail:::Erro ao tentar Obter perfil por email. Excecao:");
 			e.printStackTrace();
 			return null;
 		}

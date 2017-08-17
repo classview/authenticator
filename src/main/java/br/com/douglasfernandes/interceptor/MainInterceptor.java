@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import br.com.douglasfernandes.dataservices.entities.Perfil;
-import br.com.douglasfernandes.utils.Logs;
 
 /**
  * Intercepta solicitações (requests) antes de entregar ao controller
@@ -19,6 +18,27 @@ import br.com.douglasfernandes.utils.Logs;
  */
 public class MainInterceptor extends HandlerInterceptorAdapter implements PhaseListener{
 
+	private String[] permissions = new String[]{
+			"/resources/",
+			"dynamiccontent",
+			"esqueciMinhaSenha",
+			"testar",
+			"application",
+			"/login",
+			"/login.xhtml",
+			"servicesDescriptor",
+			"services"
+	};	
+	
+	private boolean containsPermission(String uri){
+		boolean contains = false;
+		for(String p : permissions){
+			if(uri.contains(p))
+				contains = true;
+		}
+		return contains;
+	}
+	
 	/**
 	 * Auto generated default serial.
 	 */
@@ -30,69 +50,41 @@ public class MainInterceptor extends HandlerInterceptorAdapter implements PhaseL
 		  try{
 			  String uri = request.getRequestURI();
 		      
-			  Logs.info("[MainInterceptor INFO]::preHandler:::URL("+uri+")");
-			  
 			  Perfil logado = (Perfil)request.getSession().getAttribute("logado");
 			  
-			  if(uri.contains("/resources/") || uri.contains("dynamiccontent")){
-				  Logs.info("[MainInterceptor INFO]::preHandler:::arquivo de resource");
-				  return true;
-			  }
-			  
-			  if(uri.endsWith("login")){
-				  Logs.info("[MainInterceptor INFO]::preHandler:::pagina de login");
+			  if(containsPermission(uri)){
 				  return true;
 			  }
 			  
 			  if(logado != null){
-				  Logs.info("[MainInterceptor INFO]::preHandler:::acesso permitido");
 				  return true;
 			  }
 			  else{
-				  Logs.info("[MainInterceptor INFO]::preHandler:::redirecionado para login");
 				  response.sendRedirect("login");
 				  return false;
 			  }
 		  }
 		  catch(Exception e){
-			  Logs.warn("[MainInterceptor]::preHandler:::Erro ao tentar manipular request. Exception: \n");
-				e.printStackTrace();
-				return false;
+			  e.printStackTrace();
+			  return false;
 		  }
 	 }
 
 	@Override
 	public void afterPhase(PhaseEvent event) {
-		Logs.info("[MainInterceptor INFO]::beforePhase:::phaseId: "+event.getPhaseId());
 		try{
 			HttpServletRequest request = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
 			String uri = request.getRequestURI();
 			
-			Logs.info("[MainInterceptor INFO]::beforePhase:::URL("+uri+")");
-			
 			HttpServletResponse response = (HttpServletResponse)FacesContext.getCurrentInstance().getExternalContext().getResponse();
 			Perfil logado = (Perfil)request.getSession().getAttribute("logado");
 			
-			if(!uri.endsWith("login.xhtml")){
-				if(!uri.contains("/resources/") && !uri.contains("dynamiccontent")){
-					if(logado == null){
-						Logs.info("[MainInterceptor INFO]::beforePhase:::redirecionado para login");
-						response.sendRedirect("login");
-					}
-					else{
-						Logs.info("[MainInterceptor INFO]::beforePhase:::acesso permitido");
-					}
-				}
-				else{
-					Logs.info("[MainInterceptor INFO]::beforePhase:::arquivo de resource");
-				}
-			}
-			else{
-				Logs.info("[MainInterceptor INFO]::beforePhase:::pagina de login");
+			if(!containsPermission(uri)){
+				if(logado == null)
+					response.sendRedirect("login");
 			}
 		}
 		catch(Exception e){
-			Logs.warn("[MainInterceptor]::beforePhase:::Erro ao tentar manipular request. Exception: \n");
 			e.printStackTrace();
 		}
 	}

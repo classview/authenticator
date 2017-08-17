@@ -1,8 +1,5 @@
 package br.com.douglasfernandes.dataservices.entities;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,9 +7,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.apache.commons.codec.binary.Hex;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.UploadedFile;
 
 @Entity
 @Table(name="perfis")
@@ -90,16 +84,8 @@ public class Perfil {
 	public byte[] getFoto() {
 		return foto;
 	}
-	public StreamedContent getFotoAsStream(){
-		InputStream is = new ByteArrayInputStream(foto);
-		StreamedContent imagem = new DefaultStreamedContent(is,"image/png");
-		return imagem;
-	}
 	public void setFoto(byte[] foto) {
 		this.foto = foto;
-	}
-	public void setFotoFromFile(UploadedFile file){
-		foto = file.getContents();
 	}
 	public void setDefaultFoto() throws Exception
 	{

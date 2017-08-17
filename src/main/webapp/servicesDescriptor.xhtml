@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+      
+      <h:head>
+      	<title>Serviços REST</title>
+      </h:head>
+      <h:body>
+      	<h:form id="form">
+      		<p:dataGrid var="servico" value="#{servicesDescriptorView.services}" columns="1" layout="grid"
+		        		rows="9" paginator="true" id="servicos"
+		        		paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+		        		style="margin-top: 1rem;">
+		        		
+		        <f:facet name="header">
+		            Serviços em funcionamento
+		        </f:facet>
+		 		
+		 		<p:panelGrid columns="2">
+		 			<h:outputText value="#{servico.nome}" />
+		 			<h:outputLink value="#{facesContext.externalContext.requestContextPath}/#{servico.url}">
+		 				#{facesContext.externalContext.requestContextPath}/#{servico.url}
+		 			</h:outputLink>
+		 		</p:panelGrid>
+		    </p:dataGrid>
+      	</h:form>
+      </h:body>
+</html>

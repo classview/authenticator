@@ -7,24 +7,31 @@
       <h:head>
       	<title>Login</title>
       	
+      	<link href="#{facesContext.externalContext.requestContextPath}/resources/css/default.css" rel="stylesheet" type="text/css" />
+      	
       	<link rel="shortcut icon" href="#{facesContext.externalContext.requestContextPath}/resources/favicon/favicon.ico" type="image/x-icon" />
 		<link rel="icon" href="#{facesContext.externalContext.requestContextPath}/resources/favicon/favicon.ico" type="image/x-icon" />
 		
       </h:head>
       <h:body>
-      	<p:growl id="growl" sticky="true" showDetail="true" life="750" />
-      	<h:form>            
+      	<p:growl id="growl" sticky="false" showDetail="true" life="2000" />
+      	<p:dialog styleClass="no-background" widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+		    <p:graphicImage styleClass="no-background" value="/resources/images/loader.gif" />
+		</p:dialog>
+      	<h:form id="form-login">            
+      		<p:remoteCommand name="remoteMessage" actionListener="#{userLoginView.mostrarMensagem()}" update="growl"/>
 		    <p:dialog header="Login" widgetVar="dlg" resizable="false" closable="false" closeOnEscape="false">
 		        <h:panelGrid columns="2" cellpadding="5">
 		            <h:outputLabel for="username" value="Username:" />
-		            <p:inputText id="username" value="#{userLoginView.perfil.nome}" required="true" label="username" />
+		            <p:inputText id="username" value="#{userLoginView.perfil.nome}" required="true" label="username" requiredMessage="Preencha com Usuário ou E-mail" validatorMessage="Preencha com Usuário ou E-mail" />
 		 
 		            <h:outputLabel for="password" value="Password:" />
-		            <p:password id="password" value="#{userLoginView.perfil.senha}" required="true" label="password" />
+		            <p:password id="password" value="#{userLoginView.perfil.senha}" label="password" />
 		 
 		            <f:facet name="footer">
 		                <p:commandButton value="Login" update="growl" actionListener="#{userLoginView.login}" oncomplete="handleLoginRequest(xhr, status, args)" />
-		            </f:facet>  
+			            <p:commandButton value="Esqueci minha senha" style="float: right;" actionListener="#{userLoginView.esqueciMinhaSenha()}" update="growl" onclick="remoteMessage();PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" />
+		            </f:facet>
 		        </h:panelGrid>
 		    </p:dialog>
 		</h:form>

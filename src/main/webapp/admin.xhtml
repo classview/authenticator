@@ -42,67 +42,11 @@
 			});
 		</script>
 		
-      	<h:form id="form">
-      		<p:dataGrid var="perfil" value="#{adminView.listaPerfis}" columns="3" layout="grid"
-		        		rows="9" paginator="true" id="perfis"
-		        		paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-		        		style="margin-top: 1rem;">
-		        		
-		        <f:facet name="header">
-		            Perfis cadastrados
-		        </f:facet>
-		 		
-		 		<p:panel header="#{perfil.nome}" style="text-align:center">
-		        	<p:commandLink styleClass="rem-button" title="Remover" actionListener="#{adminView.removerPerfil()}" update="growl" oncomplete="refreshPage();">
-		        		<f:param name="perfilId" value="#{perfil.id}"/>
-		      			<i id="btn-remover-perfil" class="material-icons">delete</i>
-		      		</p:commandLink>
-		      		
-		      		<p:commandLink styleClass="upd-button" actionListener="#{adminView.prepararAtualizacao}" title="Atualizar" update="atualizar" oncomplete="PF('updForm').show();">
-		      			<f:param name="perfilId" value="#{perfil.id}"/>
-		      			<i id="btn-atualizar-perfil" class="material-icons">mode_edit</i>
-		      		</p:commandLink>
-		        	
-		            <h:panelGrid columns="1" style="width:100%">
-		            	<p:graphicImage value="#{adminView.imagem}">
-		            		<f:param name="perfilId" value="#{perfil.id}"/>
-		            	</p:graphicImage>
-		            	<h:outputText value="#{perfil.email}" />
-		            	<h:outputText value="" />
-	            		<h:outputText value="#{perfil.adminAsString}" />
-	            		<h:outputText value="#{perfil.ativoAsString}" />
-		            </h:panelGrid>
-		        </p:panel>
-		 		
-		 		<p:dialog header="Atualizar Perfil" widgetVar="updForm" modal="true" height="285" width="375" resizable="false" style="overflow: hidden;">
-		    		<h:panelGrid id="atualizar" columns="2" style="width: 100%; height: 100%;">
-		   				<h:outputText style="text-align:right;" value="Foto:" />
-		   				<p:fileUpload accept="image/*" label="Foto" value="#{adminView.atualizar.fotoFromFile}" mode="simple" skinSimple="true" style="float: left;width: 100%;"/>
-		   				
-		   				<h:outputText style="text-align:right;" value="Nome:" />
-	   					<h:inputText value="#{adminView.atualizar.nome}" />
-	   					
-	   					<h:outputText style="text-align:right;" value="E-mail:" />
-	   					<h:inputText value="#{adminView.atualizar.email}" />
-	   					
-	   					<h:outputText style="text-align:right;" value="Senha:" />
-	   					<h:inputSecret value="#{adminView.atualizar.senha}" />
-	   					
-	   					<h:outputText style="text-align:right;" value="Administrador" />
-	   					<p:selectBooleanCheckbox value="#{adminView.atualizar.admin}"/>
-		   				
-		   				<f:facet name="footer">
-		   					<p:commandButton actionListener="#{adminView.atualizarPerfil}" value="Atualizar" update="growl atualizar" oncomplete="refreshPage();"/>
-		   				</f:facet>
-		   			</h:panelGrid>
-				</p:dialog>
-		 		
-		    </p:dataGrid>
-		    
-		    <p:dialog header="Cadastrar novo Perfil" widgetVar="cadForm" modal="true" height="285" width="375" resizable="false" style="overflow: hidden;">
-	    		<h:panelGrid id="cadastrar" columns="2" style="width: 100%; height: 100%;">
+      	<h:form id="form" enctype="multipart/form-data">
+      		<p:dialog id="cadastrar" header="Cadastrar novo Perfil" widgetVar="cadForm" modal="true" height="285" width="375" resizable="false" style="overflow: hidden;">
+	    		<h:panelGrid columns="2" style="width: 100%; height: 100%;">
 	   				<h:outputText style="text-align:right;" value="Foto:" />
-	   				<p:fileUpload accept="image/*" label="Foto" value="#{adminView.cadastrar.fotoFromFile}" mode="simple" skinSimple="true" style="float: left;width: 100%;"/>
+	   				<p:fileUpload accept="image/*" label="Foto" value="#{adminView.fotoCadastrar}" mode="simple" skinSimple="true" style="float: left;width: 100%;"/>
 	   				
 	   				<h:outputText style="text-align:right;" value="Nome:" />
    					<h:inputText value="#{adminView.cadastrar.nome}" />
@@ -117,10 +61,71 @@
    					<p:selectBooleanCheckbox value="#{adminView.cadastrar.admin}"/>
 	   				
 	   				<f:facet name="footer">
-	   					<p:commandButton actionListener="#{adminView.cadastrarPerfil}" value="Cadastrar" update="growl cadastrar" oncomplete="refreshPage();"/>
+	   					<p:commandButton actionListener="#{adminView.cadastrarPerfil}" value="Cadastrar" update="growl" oncomplete="refreshPage();"/>
 	   				</f:facet>
 	   			</h:panelGrid>
 			</p:dialog>
+      		<p:dialog id="atualizar" header="Atualizar Perfil" widgetVar="updForm" modal="true" height="285" width="375" resizable="false" style="overflow: hidden;">
+	    		<h:panelGrid columns="2" style="width: 100%; height: 100%;">
+	   				<h:outputText style="text-align:right;" value="Foto:" />
+	   				<p:fileUpload id="fotoAtualizar" accept="image/*" label="Foto" value="#{adminView.fotoAtualizar}" mode="simple" skinSimple="true" style="float: left;width: 100%;"/>
+	   				
+	   				<h:outputText style="text-align:right;" value="Nome:" />
+   					<p:inputText id="nome" value="#{adminView.atualizar.nome}" />
+   					
+   					<h:outputText style="text-align:right;" value="E-mail:" />
+   					<p:inputText id="email" value="#{adminView.atualizar.email}" />
+   					
+   					<h:outputText style="text-align:right;" value="Senha:" />
+   					<p:password id="senha" value="#{adminView.atualizar.senha}" />
+   					
+   					<h:outputText style="text-align:right;" value="Administrador" />
+   					<p:selectBooleanCheckbox id="admin" value="#{adminView.atualizar.admin}" disabled="#{adminView.podeAtualizarAdm() == false}"/>
+	   				
+	   				<f:facet name="footer">
+	   					<p:commandButton actionListener="#{adminView.atualizarPerfil}" value="Atualizar" update="growl" oncomplete="refreshPage();"/>
+	   				</f:facet>
+	   			</h:panelGrid>
+			</p:dialog>
+      		<p:dataGrid var="perfil" value="#{adminView.listaPerfis}" columns="3" layout="grid"
+		        		rows="9" paginator="true" id="perfis"
+		        		paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+		        		style="margin-top: 1rem;">
+		        		
+		        <f:facet name="header">
+		            Perfis cadastrados
+		        </f:facet>
+		 		
+		 		<p:panel header="#{perfil.nome}" style="text-align:center">
+		 			<p:commandLink styleClass="block-button" title="Bloquear" actionListener="#{adminView.atualizarStatusDePerfil()}" update="growl" oncomplete="refreshPage();" rendered="#{perfil.ativo == true}">
+		        		<f:param name="perfilId" value="#{perfil.id}"/>
+		      			<i id="btn-remover-perfil" class="material-icons">block</i>
+		      		</p:commandLink>
+		      		
+		      		<p:commandLink styleClass="unblock-button" title="Desbloquear" actionListener="#{adminView.atualizarStatusDePerfil()}" update="growl" oncomplete="refreshPage();" rendered="#{perfil.ativo == false}">
+		        		<f:param name="perfilId" value="#{perfil.id}"/>
+		      			<i id="btn-remover-perfil" class="material-icons">block</i>
+		      		</p:commandLink>
+		      		
+		        	<p:commandLink styleClass="rem-button" title="Remover" actionListener="#{adminView.removerPerfil()}" update="growl" oncomplete="refreshPage();">
+		        		<f:param name="perfilId" value="#{perfil.id}"/>
+		      			<i id="btn-remover-perfil" class="material-icons">delete</i>
+		      		</p:commandLink>
+		      		
+		      		<p:commandLink styleClass="upd-button" actionListener="#{adminView.prepararAtualizacao}" title="Atualizar" update=":form:atualizar" oncomplete="PF('updForm').show();">
+		      			<f:param name="perfilId" value="#{perfil.id}"/>
+		      			<i id="btn-atualizar-perfil" class="material-icons">mode_edit</i>
+		      		</p:commandLink>
+		        	
+		            <h:panelGrid columns="1" style="width:100%">
+		            	<img class="perfil-image" src="mostrarFotoDePerfil?id=#{perfil.id}"/>
+		            	<h:outputText value="#{perfil.email}" />
+		            	<h:outputText value="" />
+	            		<h:outputText value="#{perfil.adminAsString}" />
+	            		<h:outputText value="#{perfil.ativoAsString}" />
+		            </h:panelGrid>
+		        </p:panel>
+		    </p:dataGrid>
 		</h:form>
 		
 	</h:body>

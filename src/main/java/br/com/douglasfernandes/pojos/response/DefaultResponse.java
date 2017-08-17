@@ -1,4 +1,4 @@
-package br.com.douglasfernandes.pojos;
+package br.com.douglasfernandes.pojos.response;
 
 import javax.faces.application.FacesMessage;
 
